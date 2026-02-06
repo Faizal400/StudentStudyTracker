@@ -4,7 +4,7 @@
 ## The original (small) plan outline for this project.
 Visit:
 > https://github.com/Faizal400/Smart-Study-Tracker
-*(Check plan.md and technical-plan.md)
+*(Check plan.md and technical-plan.md)*
 ---
 ### What this application has to offer so far
 - basic auth (login/register/logout)
