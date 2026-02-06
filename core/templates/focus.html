@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Focus{% endblock %}
+
+{% block content %}
+<div class="text-center">
+  <h2>Focus Timer</h2>
+
+  <div class="mx-auto" style="max-width: 360px;">
+    <label class="mt-3">Subject</label>
+    <select id="subjectSelect" class="form-control">
+      <option value="">-- Choose a subject --</option>
+      {% for s in subjects %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+
+    <small id="saveStatus" class="d-block mt-2"></small>
+  </div>
+
+  <h1 id="timer" class="display-3 mt-4" contenteditable="true">25:00</h1>
+
+  <button id="startBtn" class="btn btn-success m-2">Start</button>
+  <button id="stopBtn" class="btn btn-danger m-2">Stop</button>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/timer.js' %}"></script>
+{% endblock %}
