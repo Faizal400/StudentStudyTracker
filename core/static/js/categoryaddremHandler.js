@@ -213,6 +213,7 @@ confirmAddSubject.addEventListener("click", async () => {
 
     // Close modal (Bootstrap 4)
     window.$("#addSubjectModal").modal("hide");
+    location.reload(); // Reload the page to reflect changes (simplest way)
   } catch (err) {
     addSubjectError.textContent = "Network error. Check your server is running.";
   }
@@ -258,6 +259,7 @@ confirmAddMSM.addEventListener("click", async () => {
     // Close modal (Bootstrap 4)
     selectedType = null;
     window.$("#addModuleSubModuleModal").modal("hide");
+    location.reload(); // Reload the page to reflect changes (simplest way)
   } catch (err) {
     msmError.textContent = "Network error. Check your server is running.";
   }
@@ -294,8 +296,10 @@ confirmRemoveSubject.addEventListener("click", async () => {
     console.log("Removed type:", selectedType);
     // Close modal
     window.$("#removeSubjectModal").modal("hide");
+    location.reload(); // Reload the page to reflect changes (simplest way)
   } catch (err) {
     removeSubjectError.textContent = "Network error. Check your server is running.";
+
   }
 });
 
@@ -325,20 +329,20 @@ confirmRemoveMSM.addEventListener("click", async () => {
       },
       body: JSON.stringify({ id: optionID, type: selectedType }),
     });
-
     const data = await res.json();
 
     if (!data.ok) {
       removeMSMError.textContent = data.error || "Failed to remove module/submodule.";
       return;
     }
-
+    
     //removeSubjectFromUI(data.deleted_id);
     console.log("Removed type:", selectedType);
     // Close modal
     selectedType = null;
     window.$("#removeModuleSubModuleModal").modal("hide");
     console.log("Closed remove modal. Successfully sent!");
+    location.reload(); // Reload the page to reflect changes (simplest way)
   } catch (err) {
     removeMSMError.textContent = "Network error. Check your server is running.";
     console.error("Error during removal:", err);
