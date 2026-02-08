@@ -181,8 +181,10 @@ def api_create_session(request):
         data = json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
         return JsonResponse({"ok": False, "error": "Invalid JSON."}, status=400)
-
     subject_id = data.get("subject_id")
+    session_type = data.get("session_type")
+    sendPrintStatement(json.dumps(data, indent = 4))
+    print(f"Session Type: {session_type}")
     duration_seconds = data.get("duration_seconds")
 
     # Validate duration
@@ -195,18 +197,45 @@ def api_create_session(request):
         return JsonResponse({"ok": False, "error": "Session duration must be > 0."}, status=400)
 
     # Validate subject belongs to this user
-    try:
-        subject_id = int(subject_id)
-        subject = Subject.objects.get(id=subject_id, user=request.user)
-    except (TypeError, ValueError, Subject.DoesNotExist):
-        return JsonResponse({"ok": False, "error": "Invalid subject."}, status=400)
-
-    session = StudySession.objects.create(
-        user=request.user,
-        subject=subject,
-        duration_seconds=duration_seconds,
-        started_at=timezone.now(),   # simple for now
-        ended_at=timezone.now(),
-    )
+    
+    if session_type == "subject":
+        try:
+            subject_id = int(subject_id)
+            subject = Subject.objects.get(id=subject_id, user=request.user)
+        except (TypeError, ValueError, Subject.DoesNotExist):
+            return JsonResponse({"ok": False, "error": "Invalid subject."}, status=400)
+        session = StudySession.objects.create(
+            user=request.user,
+            subject=subject,
+            duration_seconds=duration_seconds,
+            started_at=timezone.now(),   # simple for now
+            ended_at=timezone.now(),
+            )
+    elif session_type == "module":
+        try:
+            module_id = int(subject_id)
+            module = Module.objects.get(id=module_id, subject__user=request.user)
+        except (TypeError, ValueError, Module.DoesNotExist):
+            return JsonResponse({"ok": False, "error": "Invalid module."}, status=400)
+        session = StudySession.objects.create(
+            user=request.user,
+            module=module,
+            duration_seconds=duration_seconds,
+            started_at=timezone.now(),   # simple for now
+            ended_at=timezone.now(),
+            )
+    elif session_type == "submodule":
+        try:
+            submodule_id = int(subject_id)
+            submodule = SubModule.objects.get(id=submodule_id, module__subject__user=request.user)
+        except (TypeError, ValueError, SubModule.DoesNotExist):
+            return JsonResponse({"ok": False, "error": "Invalid submodule."}, status=400)
+        session = StudySession.objects.create(
+            user=request.user,
+            submodule=submodule,
+            duration_seconds=duration_seconds,
+            started_at=timezone.now(),   # simple for now
+            ended_at=timezone.now(),
+            )
 
     return JsonResponse({"ok": True, "session_id": session.id})

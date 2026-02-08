@@ -61,7 +61,7 @@ timerElement.addEventListener("blur", () => {
 // ---------- Save session to backend ----------
 async function saveSession() {
   const subjectId = subjectSelect.value;
-
+  const sessionType = subjectSelect.options[subjectSelect.selectedIndex].getAttribute("type") || "unknown";
   if (!subjectId) {
     saveStatus.textContent = "Pick a subject before saving.";
     saveStatus.className = "d-block mt-2 text-danger";
@@ -84,6 +84,7 @@ async function saveSession() {
       body: JSON.stringify({
         subject_id: subjectId,
         duration_seconds: elapsedSeconds,
+        session_type: sessionType,
       }),
     });
 
