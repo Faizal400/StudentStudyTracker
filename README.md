@@ -87,11 +87,15 @@ Visit:
 ## Key pages & routes
 **Pages**
 > `/` → Home (manage study categories)
+
 > `/focus/` → Focus timer + save sessions
+
 > `/insights/` → Time insights + rankings
 **Auth**
 > `/register/`
+
 > `/login/`
+
 > `/logout/`
 ---
 ## Data model summary (starter)
