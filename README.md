@@ -87,11 +87,15 @@ Visit:
 ## Key pages & routes
 **Pages**
 > `/` → Home (manage study categories)
+
 > `/focus/` → Focus timer + save sessions
+
 > `/insights/` → Time insights + rankings
 **Auth**
 > `/register/`
+
 > `/login/`
+
 > `/logout/`
 ---
 ## Data model summary (starter)
@@ -184,7 +188,12 @@ Visit:
     - [*screenshot*]
 12. **Browser DevTools → Network tab showing POST to:**
     - `/api/sessions/create/` returning `{ ok: true }`
-        - ![](image-1.png)
+        - ![](app_screenshots/subjectAddterminal.png)
 
+<<<<<<< HEAD
 13. **DB file exists (db.sqlite3)**
     - [*screenshot*]
+=======
+11. **DB file exists (db.sqlite3)**
+    - [*screenshot*]
+>>>>>>> 22726861065fba6b438ff8ab6b667c3c47ac6ecc
