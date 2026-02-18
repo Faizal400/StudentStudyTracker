@@ -25,9 +25,9 @@ Visit:
 **__Study Tree (Subjects → Modules → SubModules)__**
 - Sidebar displays a hierarchical study tree
 - Create + remove:
-- - Subjects
-- - Modules (under subject)
-- - SubModules (under module)
+    - Subjects
+    - Modules (under subject)
+    - SubModules (under module)
 - UI uses Bootstrap modals; backend uses Django ORM
 
 **__Focus Timer + Session Logging__**
@@ -35,7 +35,7 @@ Visit:
 - Timer display is editable (validated MM:SS, bounded minutes/seconds)
 - On stop or completion, the session is saved via POST request (AJAX/fetch)
 - Sessions can be linked to:
-- - Subject OR Module OR SubModule (starter implementation)
+    - Subject OR Module OR SubModule (starter implementation)
 **__Insights (starter analytics)__**
 - All-time study hours
 - Last 7 days study hours
@@ -106,11 +106,11 @@ Visit:
 - **Module**: belongs to a Subject
 - **SubModule**: belongs to a Module
 - **StudySession**: recorded study event with:
-- - user
-- - optional subject/module/submodule
-- - duration_seconds
-- - started_at / ended_at
-- - created_at
+    - user
+    - optional subject/module/submodule
+    - duration_seconds
+    - started_at / ended_at
+    - created_at
 ---
 ## API endpoints (current)
 *Note: (All POST + CSRF protected)*
