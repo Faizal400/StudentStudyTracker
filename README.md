@@ -144,42 +144,47 @@ Visit:
 
 ### Core flow screenshots
 1. **Login page**:
-    - [*screenshot*]
+    - ![This is the login page](app_screenshots/Login.png)
 
 2. **Register page**:
-    - [*screenshot*]
+    - ![Where the user registers. I'll need to add a "register" button for UX.](app_screenshots/Register.png)
 
 3. **Homepage + sidebar tree populated (Subjects → Modules → SubModules visible)**:
-    - [*screenshot*]
+    - ![Homepage](app_screenshots/Homepage.png)
 
 4. **Add Category modal (show choosing Subject/Module/SubModule)**:
-    - [*screenshot*]
+    - ![Category modal where the user can either add a sub/mod/smod. The remove cat modal is also similar, but with different colours.](app_screenshots/addCatModal.png)
 
-5. **Focus page before starting (subject selection dropdown visible)**:
-    - [*screenshot*]
+5. **Remove Category modal (show choosing Subject/Module/SubModule)**:
+    - ![Remove category (subject/module/submodule). When you click next you can remove exactly what you want (via dropdown)](app_screenshots/removeCatModal.png)
+![alt text](image.png)
+6. **Add/Remove a Subject/Module/SubModule confirmations**:
+    - ![user can specifically select what they want to remove. This comes straight after the remove category modals (screenshot 5)](app_screenshots/removeOption.png)
+    - ![user can specifically select what they want to remove. This comes straight after the remove category modals (screenshot 5)](app_screenshots/removeOptDropdown.png)
+////////////\\\\\\\\\\\\\\\\\\\
+*The adding of types:*
+    - ![user can specifically select what they want to add. This comes straight after the add category modals (screenshot 4)](app_screenshots/addOption.png)
+    - ![user can specifically select what they want to add. This comes straight after the add category modals (screenshot 4)](app_screenshots/addOptionDropdown.png)
+7. **Focus page before starting (subject selection dropdown visible)**:
+    - ![User can select module/subject/submodule to focus on. Right now the UX isn't great but the functionality works.](app_screenshots/FocusDropdown.png)
 
-6. **Timer running (show Pause state)**
-    - [*screenshot*]
+8. **Timer running (show Pause state)**
+    - ![Shows the timer runs on selected dropdown.](app_screenshots/TimerRunning_Module.png)
 
-7. **Stop → “Saved ✅” status (proof session logging works)**
-    - [*screenshot*]
+9. **Stop → “Saved ✅” status (proof session logging works)**
+    - ![In screenshot 8 when the timer is running and you press Pause, the Pause button is turned into a "Stop" button and the timer is paused. If you press "Stop" it saves session duration, if you press "Play" then the Stop button is turned back into the Pause button.](app_screenshots/focusTimerSaved.png)
 
-8. **Insights page showing**:
-    - last 7 days hours
-        - [*screenshot*]
-
-    - all-time hours
-        - [*screenshot*]
-    - ranked subjects table
-        - [*screenshot*]
+10. **Insights page showing**:
+- last 7 days, all time hours & ranked subjects table
+        - ![alt text](app_screenshots/Insights1.png)
 
 ## “Proof” / technical credibility screenshots
 
-9. **Django Admin showing StudySession rows in the database**
+11. **Django Admin showing StudySession rows in the database**
     - [*screenshot*]
-10. **Browser DevTools → Network tab showing POST to:**
+12. **Browser DevTools → Network tab showing POST to:**
     - `/api/sessions/create/` returning `{ ok: true }`
-        - [*screenshot*]
+        - ![](image-1.png)
 
-11. **DB file exists (db.sqlite3)**
+13. **DB file exists (db.sqlite3)**
     - [*screenshot*]
