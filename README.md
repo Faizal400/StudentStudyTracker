@@ -188,12 +188,7 @@ Visit:
     - [*screenshot*]
 12. **Browser DevTools → Network tab showing POST to:**
     - `/api/sessions/create/` returning `{ ok: true }`
-        - ![](app_screenshots/subjectAddterminal.png)
+        - ![](app_screenshots/subjectAddterminal-1.png)
 
-<<<<<<< HEAD
 13. **DB file exists (db.sqlite3)**
     - [*screenshot*]
-=======
-11. **DB file exists (db.sqlite3)**
-    - [*screenshot*]
->>>>>>> 22726861065fba6b438ff8ab6b667c3c47ac6ecc
