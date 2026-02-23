@@ -180,6 +180,180 @@ function removeSubjectFromUI(subjectId) {
   }
 }
 
+// ==============================
+// SIDEBAR DOM HELPERS (DIV layout)
+// ==============================
+function getSidebarRoot() {
+  return document.getElementById("sidebarTree");
+}
+
+function removeSidebarEmptyMsg() {
+  const msg = document.getElementById("sidebarEmptyMsg");
+  if (msg) msg.remove();
+}
+
+function ensureSubjectNode(subject) {
+  const root = getSidebarRoot();
+  if (!root) return null;
+
+  removeSidebarEmptyMsg();
+
+  let subjectDiv = root.querySelector(`div[data-subject-id="${subject.id}"]`);
+  if (subjectDiv) return subjectDiv;
+
+  subjectDiv = document.createElement("div");
+  subjectDiv.dataset.subjectId = subject.id;
+  subjectDiv.className = "border rounded p-2 mb-3";
+
+  const header = document.createElement("div");
+  header.className = "font-weight-bold text-nowrap";
+  header.innerHTML = `<span class="badge badge-primary mr-2">Subject</span> <span class="subject-name"></span>`;
+  header.querySelector(".subject-name").textContent = subject.name;
+
+  const modulesContainer = document.createElement("div");
+  modulesContainer.className = "ml-3 mt-2 modules-container";
+
+  // placeholder (optional)
+  const noModules = document.createElement("div");
+  noModules.className = "text-muted small no-modules-msg";
+  noModules.textContent = "No modules yet";
+  modulesContainer.appendChild(noModules);
+
+  subjectDiv.appendChild(header);
+  subjectDiv.appendChild(modulesContainer);
+  root.appendChild(subjectDiv);
+
+  return subjectDiv;
+}
+
+function addModuleToSidebar(moduleObj, subjectId) {
+  const root = getSidebarRoot();
+  if (!root) return;
+
+  const subjectDiv = root.querySelector(`div[data-subject-id="${subjectId}"]`);
+  if (!subjectDiv) return;
+
+  const modulesContainer = subjectDiv.querySelector(".modules-container");
+  if (!modulesContainer) return;
+
+  // remove placeholder
+  const noModules = modulesContainer.querySelector(".no-modules-msg");
+  if (noModules) noModules.remove();
+
+  // avoid duplicates
+  if (modulesContainer.querySelector(`div[data-module-id="${moduleObj.id}"]`)) return;
+
+  const moduleDiv = document.createElement("div");
+  moduleDiv.dataset.moduleId = moduleObj.id;
+  moduleDiv.className = "mb-2";
+
+  const title = document.createElement("div");
+  title.className = "text-primary text-nowrap";
+  title.innerHTML = `<span class="badge badge-info mr-2">Module</span> <span class="module-name"></span>`;
+  title.querySelector(".module-name").textContent = moduleObj.name;
+
+  const submodulesContainer = document.createElement("div");
+  submodulesContainer.className = "ml-4 submodules-container";
+
+  const noSub = document.createElement("div");
+  noSub.className = "text-muted small no-submodules-msg";
+  noSub.textContent = "No submodules yet";
+  submodulesContainer.appendChild(noSub);
+
+  moduleDiv.appendChild(title);
+  moduleDiv.appendChild(submodulesContainer);
+  modulesContainer.appendChild(moduleDiv);
+}
+
+function addSubmoduleToSidebar(subObj, moduleId) {
+  const root = getSidebarRoot();
+  if (!root) return;
+
+  const moduleDiv = root.querySelector(`div[data-module-id="${moduleId}"]`);
+  if (!moduleDiv) return;
+
+  const subContainer = moduleDiv.querySelector(".submodules-container");
+  if (!subContainer) return;
+
+  // remove placeholder
+  const noSub = subContainer.querySelector(".no-submodules-msg");
+  if (noSub) noSub.remove();
+
+  // avoid duplicates
+  if (subContainer.querySelector(`div[data-submodule-id="${subObj.id}"]`)) return;
+
+  const subDiv = document.createElement("div");
+  subDiv.dataset.submoduleId = subObj.id;
+  subDiv.className = "text-muted d-flex";
+  subDiv.innerHTML = `<span class="badge badge-light mr-2 flex-shrink-0">SubM</span> <span class="submodule-name text-truncate small"></span>`;
+  subDiv.querySelector(".submodule-name").textContent = subObj.name;
+
+  subContainer.appendChild(subDiv);
+}
+
+function removeSubjectFromSidebar(subjectId) {
+  const root = getSidebarRoot();
+  if (!root) return;
+
+  const subjectDiv = root.querySelector(`div[data-subject-id="${subjectId}"]`);
+  if (subjectDiv) subjectDiv.remove();
+
+  // if no subjects left, show empty msg
+  if (root.querySelectorAll(`div[data-subject-id]`).length === 0) {
+    const empty = document.createElement("div");
+    empty.id = "sidebarEmptyMsg";
+    empty.className = "text-muted";
+    empty.textContent = "No subjects added yet.";
+    root.appendChild(empty);
+  }
+}
+
+function removeModuleFromSidebar(moduleId) {
+  const moduleDiv = document.querySelector(`div[data-module-id="${moduleId}"]`);
+  if (!moduleDiv) return;
+
+  const modulesContainer = moduleDiv.parentElement; // the subject's container holding modules
+  moduleDiv.remove();
+
+  // If no modules left under this subject, show placeholder
+  const remainingModules = modulesContainer.querySelectorAll(`div[data-module-id]`);
+  if (remainingModules.length === 0) {
+    if (!modulesContainer.querySelector(".no-modules-msg")) {
+      const msg = document.createElement("div");
+      msg.className = "text-muted small no-modules-msg";
+      msg.textContent = "No modules yet";
+      modulesContainer.appendChild(msg);
+    }
+  }
+}
+
+function removeSubmoduleFromSidebar(submoduleId) {
+  const subDiv = document.querySelector(`div[data-submodule-id="${submoduleId}"]`);
+  if (!subDiv) return;
+
+  const subContainer = subDiv.parentElement; // the module's container holding submodules
+  subDiv.remove();
+
+  // If no submodules left under this module, show placeholder
+  const remainingSubs = subContainer.querySelectorAll(`div[data-submodule-id]`);
+  if (remainingSubs.length === 0) {
+    if (!subContainer.querySelector(".no-submodules-msg")) {
+      const msg = document.createElement("div");
+      msg.className = "text-muted small no-submodules-msg";
+      msg.textContent = "No submodules yet";
+      subContainer.appendChild(msg);
+    }
+  }
+}
+
+function removeOptionFromSelect(selectEl, value) {
+  if (!selectEl) return;
+  const opt = selectEl.querySelector(`option[value="${value}"]`);
+  if (opt) opt.remove();
+}
+
+// ==============================
+
 // --- Add subject to database (AJAX) ---
 confirmAddSubject.addEventListener("click", async () => {
   addSubjectError.textContent = "";
@@ -213,7 +387,7 @@ confirmAddSubject.addEventListener("click", async () => {
 
     // Close modal (Bootstrap 4)
     window.$("#addSubjectModal").modal("hide");
-    location.reload(); // Reload the page to reflect changes (simplest way)
+    ensureSubjectNode(data.subject); //update sidebar w/o reload
   } catch (err) {
     addSubjectError.textContent = "Network error. Check your server is running.";
   }
@@ -259,7 +433,26 @@ confirmAddMSM.addEventListener("click", async () => {
     // Close modal (Bootstrap 4)
     selectedType = null;
     window.$("#addModuleSubModuleModal").modal("hide");
-    location.reload(); // Reload the page to reflect changes (simplest way)
+    //update sidebar w/o reload
+    if (data.ok) {
+      if (data.type === "module") {
+        // Expect backend to return: data.item or data.module
+        const moduleObj = data.item || data.module;
+        const parentSubjectId = selectedParentId;
+        addModuleToSidebar(moduleObj, parentSubjectId);
+
+        // Module dropdowns (for adding/removing)
+        addOption(moduleSelect, moduleObj.id, moduleObj.name);
+        addOption(selectedModuleRemove, moduleObj.id, moduleObj.name);
+      }
+      if (data.type === "submodule") {
+        const subObj = data.item || data.submodule;
+        const parentModuleId = selectedParentId;
+        addSubmoduleToSidebar(subObj, parentModuleId);
+
+        addOption(selectedSubModuleRemove, subObj.id, subObj.name);
+      }
+    }
   } catch (err) {
     msmError.textContent = "Network error. Check your server is running.";
   }
@@ -282,7 +475,7 @@ confirmRemoveSubject.addEventListener("click", async () => {
         "Content-Type": "application/json",
         "X-CSRFToken": csrftoken,
       },
-      body: JSON.stringify({ id: id, type: selectedType }),
+      body: JSON.stringify({ id: id, type: "subject" }),
     });
 
     const data = await res.json();
@@ -296,7 +489,7 @@ confirmRemoveSubject.addEventListener("click", async () => {
     console.log("Removed type:", selectedType);
     // Close modal
     window.$("#removeSubjectModal").modal("hide");
-    location.reload(); // Reload the page to reflect changes (simplest way)
+    removeSubjectFromSidebar(data.deleted_id);
   } catch (err) {
     removeSubjectError.textContent = "Network error. Check your server is running.";
 
@@ -305,6 +498,7 @@ confirmRemoveSubject.addEventListener("click", async () => {
 
 // --- Remove Modules/SubModules (AJAX) ---
 confirmRemoveMSM.addEventListener("click", async () => {
+  const typeToRemove = selectedType;
   console.log("Attempting to remove type:", selectedType);
   removeMSMError.textContent = "";
   var optionID = null;
@@ -335,14 +529,22 @@ confirmRemoveMSM.addEventListener("click", async () => {
       removeMSMError.textContent = data.error || "Failed to remove module/submodule.";
       return;
     }
-    
-    //removeSubjectFromUI(data.deleted_id);
     console.log("Removed type:", selectedType);
+    // Update sidebar DOM immediately
+    if (typeToRemove === "module") {
+      removeModuleFromSidebar(optionID);
+      removeOptionFromSelect(moduleSelect, optionID);
+      removeOptionFromSelect(selectedModuleRemove, optionID);
+      // NOTE: submodules dropdown may now contain stale submodules from that module
+      // You can clear it later when you implement dependent dropdowns.
+    } else if (typeToRemove === "submodule") {
+      removeSubmoduleFromSidebar(optionID);
+      removeOptionFromSelect(selectedSubModuleRemove, optionID);
+    }
     // Close modal
     selectedType = null;
     window.$("#removeModuleSubModuleModal").modal("hide");
     console.log("Closed remove modal. Successfully sent!");
-    location.reload(); // Reload the page to reflect changes (simplest way)
   } catch (err) {
     removeMSMError.textContent = "Network error. Check your server is running.";
     console.error("Error during removal:", err);

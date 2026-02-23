@@ -99,21 +99,17 @@ def isNameandDatatypeValid(data):
     if len(name) > 80:
         return False, JsonResponse({"ok": False, "error": f"{dataTypeName} name too long (max 80)."}, status=400), "None", "None"
     return True, name, dataTypeName, ParentId
-def getJsonResponse(dataTypeName, createdData, created):
-    """
-    3 dataTypes:
-    - Subject
-    - Module
-    - Sub Module
-    """
+
+def getJsonResponse(dataTypeName, createdData, created, parent_id=None):
     data = {
         "ok": True,
-        dataTypeName: {"id": createdData.id, "name": createdData.name},
-        "created": created
+        "type": dataTypeName,  # "subject" | "module" | "submodule"
+        "item": {"id": createdData.id, "name": createdData.name},
+        "created": created,
+        "parent_id": parent_id
     }
-    jsR = JsonResponse(data)
-    sendPrintStatement(json.dumps(data, indent = 4))
-    return jsR
+    return JsonResponse(data)
+
 
 @login_required
 @require_POST
@@ -121,7 +117,7 @@ def api_add_subject(request):
     DataValid, data = isDataValid(request)
     sendPrintStatement(request.body)
     sendPrintStatement(json.dumps(data, indent = 4))
-    if not isDataValid:
+    if not DataValid:
         return data
 
     validNaming, name, dataType, ParentId = isNameandDatatypeValid(data)
