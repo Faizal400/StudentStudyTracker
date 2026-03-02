@@ -4,11 +4,11 @@
 
 
 **Test 1 outline**:
-1. Test 1 [A - F]: Add button on homepage
-2. Test 1 [G - I]: Remove button on homepage
-3. Test 1 -: Focus page (dropdown, start, pause, stop, db updated)
-4. Test 1 -: Insights page (though testing this is useless through my current means, it'll be of use when I create user dummies)
-5. Test 1 -: Login + Logout + Register
+1. [A - F]: Add button on homepage
+2. [G - I]: Remove button on homepage
+3. [J - P]: Focus page (dropdown, start, pause, stop, db updated)
+4. [Q - Q]: Insights page (though testing this is useless through my current means, it'll be of use when I create user dummies)
+5. [R - T]: Login + Logout + Register
 
 __Test 1A: Adding Subject__
 Subject name: `SUBJECT NAME`
@@ -81,11 +81,67 @@ __TEST 1J: Focus page dropdown (does it display all s/m/sm?)__
 - Notes:
     - > Functionality works as expected but the UX / design sucks - it's hard to tell + some text don't appear on the whole dropdown on a 1920x1080p screen.
 
-__TEST 1K: Focus page: Start timer__
+__TEST 1K: Focus page: Change timer duration__
+- ![You can type the duration, even though the user may not find it out due to poor UX](test_screenshots/test1_a/change_focus_timer.png)
+> You can type the duration, even though the user may not find it out due to poor UX
 
+__TEST 1L: Focus page: Change timer duration using invalid formatting / values__
+- Invalid values (test: abc)
+    - ![Error message displayed. Even if you press OK, it won't try starting a timer that doesn't follow the correct formatting.](image.png)
+> Error message displayed. Even if you press OK, it won't try starting a timer that doesn't follow the correct formatting.
 
+__TEST 1M: Focus page: Start timer__
+- Works as expected:
+    - ![Start Timer:](test_screenshots/test1_a/focus_time_moving.png) 
 
+__TEST 1N: Focus page: Timer duration finished (XX:XX -> 0:00)__
+![Time completed](test_screenshots/test1_a/focus_times_up.png)
+- Works as expected, and once the timer is up it's saved to DB as expected.
 
-Future additions/fixes:
+__TEST 1O: Focus page: Pause Timer__
+- Works as expected. When you pause, you can revert the timer back to it's original value (that the user originally entered) since the pause button becomes stop (whilst the timer is paused, if it isn't paused, the Pause button is Pause)
+    - ![Timer Paused](test_screenshots/test1_a/focus_pause_timer.png)
+
+__TEST 1P: Focus page: Stop Timer early__
+- Should stop the timer completely (reset back to original time set by user, not to 0) and save the duration.
+    - ![alt text](test_screenshots/test1_a/focus_timer_stop_early.png) 
+> Works as expected
+
+__TEST 1Q: Insights page__
+- This is currently useless as there's not much data. I'll make a more in-depth one in Test 2.
+- Does it display all the intended information?
+    - ![Insights page](test_screenshots/test1_a/Insights_page.png) 
+- Yes it does
+
+__TEST 1R: Login__
+- Can user login with their details?
+- Are login usernames case sensitive?
+    - ![Login page](test_screenshots/test1_a/login_1.png) 
+    - ![alt text](test_screenshots/test1_a/login_2.png)
+- Works as expected though not really user intuitive
+
+__TEST 1S: Logout__
+- No point sending a screenshot of this (not suitable for screenshot format, but it would be for video)
+- However it works as intended. You press log out (Whilst logged in) and it redirects you to the login page when you log out
+
+__TEST 1T: Register__
+        - ![alt text](test_screenshots/test1_a/register_screen.png)
+- Maximum characters allowed for username will be lowered from 150 to 20
+- Though apart from the above, the logic works fine and does as intended (creates an account, logs a user in, and they can log back in via login when logged out)
+
+# Future additions/fixes:
+- In future tests, use the following structure:
+    - Test title / name
+    - Test Goal / expected outputs
+    - Screenshot
+    - Whether or not the goal / expected outputs were recieved
 - Red warning text on add modal keeps appearing "randomly". This should easily be fixable.
 - When adding a s/m/sm, allow the user to hit the `enter` key as well for faster addition.
+- On the Focus Timer's dropdown (where you select s/m/sm), it's UX is poorly done - the text (as shown in Test 1J) isn't clear and it falls out of the box itself due to it's redundant nature. Try make the dropdown similar to the sidebar in design
+- Passwords
+- No register button (currently have to access by typing a URL)
+- Currently when stopping the focus timer, it would reset back to original user set duration and save whatever thus far. What if the user makes a mistake (e.g: misclick start) and doesn't want to save that?
+    - I think I should add a feature, or a checkbox where it's something of the sort "Automatically save sessions on stop". If this is enabled, it works as it currently does. If it isn't, it would prompt the user the option to save the session, whilst also showing the duration and the s/m/sm they were doing.
+
+Whitespace (small visual error):
+    - ![whitespace](test_screenshots/test1_a/dropdown_settings_whitespace.png)
