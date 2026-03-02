@@ -1,4 +1,4 @@
-# Smart Study Tracker
+# Student Study Tracker
 > A Django web application that helps students track study time by subject/module/submodule, run a focus timer and view time-based categorised insights - allowing a simple way to log time and build consistency.
 *Instead of just “a timer”, it links sessions to a hierarchical study tree and surfaces time-based insights (starter phase).*
 
