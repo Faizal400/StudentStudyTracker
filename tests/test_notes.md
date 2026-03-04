@@ -1,3 +1,7 @@
+
+---
+---
+---
 # Test 1
 > A little unorganised, but the aim for Test 1 is to run through the entire web app. Starting on every single homepage feature, then moving onto the other pages (focus) and then wrapping it up with login / logout.
 >   - In Test 2 I'll have to provide special cases + test data (e.g what happens if an integer is too high? And maybe simulate all kinds of users)
@@ -135,7 +139,8 @@ __TEST 1T: Register__
     - Test Goal / expected outputs
     - Screenshot
     - Whether or not the goal / expected outputs were recieved
-- Red warning text on add modal keeps appearing "randomly". This should easily be fixable.
+- Red warning text on add modal keeps appearing "randomly". This should easily be fixable. `[FIXED]`
+- If you don't select anything on chooseCategoryModal, instead of telling the user to pick something it'd pick the prevoiusly chosen option (if there is one). If there isn't, nothing happens.
 - When adding a s/m/sm, allow the user to hit the `enter` key as well for faster addition.
 - On the Focus Timer's dropdown (where you select s/m/sm), it's UX is poorly done - the text (as shown in Test 1J) isn't clear and it falls out of the box itself due to it's redundant nature. Try make the dropdown similar to the sidebar in design
 - Passwords

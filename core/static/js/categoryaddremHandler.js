@@ -99,6 +99,11 @@ cancelOptionSelection.addEventListener("click", (e) => {
 
 // Confirm category selection
 confirmOptionSelection.addEventListener("click", (e) => {
+  // Clear any previous error messages
+  addSubjectError.textContent = "";
+  msmError.textContent = "";
+  removeSubjectError.textContent = "";
+  removeMSMError.textContent = "";
   if (selectedType == "subject") {
     window.$("#chooseCategoryModal").modal("hide");
     if (AddorRemove == "add") {
