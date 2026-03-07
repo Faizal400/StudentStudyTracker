@@ -82,7 +82,7 @@ async function saveSession() {
         "X-CSRFToken": csrftoken,
       },
       body: JSON.stringify({
-        subject_id: subjectId,
+        item_id: subjectId,
         duration_seconds: elapsedSeconds,
         session_type: sessionType,
       }),
