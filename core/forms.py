@@ -9,7 +9,11 @@ class RegisterForm(UserCreationForm):
         if User.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError("That username is already taken.")
         return username
-
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("That email is already registered.")
+        return email
 
     class Meta:
         model = User

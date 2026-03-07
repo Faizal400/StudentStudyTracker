@@ -1,3 +1,5 @@
+const csrftoken = getCookie("csrftoken");
+
 let timer = null;
 let timeLeft = 25 * 60;
 let startingTime = timeLeft;  // what reset returns to
@@ -9,19 +11,6 @@ const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
 const subjectSelect = document.getElementById("subjectSelect");
 const saveStatus = document.getElementById("saveStatus");
-
-// ---------- CSRF helper (needed for Django POST) ----------
-function getCookie(name) {
-  const cookies = document.cookie ? document.cookie.split(";") : [];
-  for (let c of cookies) {
-    c = c.trim();
-    if (c.startsWith(name + "=")) {
-      return decodeURIComponent(c.substring(name.length + 1));
-    }
-  }
-  return null;
-}
-const csrftoken = getCookie("csrftoken");
 
 // ---------- UI: update timer ----------
 function updateTimerDisplay() {

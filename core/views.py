@@ -127,11 +127,17 @@ def api_add_subject(request):
             subject, created = Subject.objects.get_or_create(user=request.user, name=name)
             return getJsonResponse(dataTypeName= dataType, createdData= subject, created=created)
         elif dataType == "module":
-            parent_subject = Subject.objects.get(id=ParentId, user=request.user)
+            try:
+                parent_subject = Subject.objects.get(id=ParentId, user=request.user)
+            except Subject.DoesNotExist:
+                return JsonResponse({"ok": False, "error": "Parent subject not found."}, status=404)
             module, created = Module.objects.get_or_create(subject=parent_subject, name=name)
             return getJsonResponse(dataTypeName=dataType, createdData= module, created=created)
         elif dataType == "submodule":
-            parent_module = Module.objects.get(id=ParentId, subject__user=request.user)
+            try:
+                parent_module = Module.objects.get(id=ParentId, subject__user=request.user)
+            except Module.DoesNotExist:
+                return JsonResponse({"ok": False, "error": "Parent module not found."}, status=404)
             submodule, created = SubModule.objects.get_or_create(module=parent_module, name=name)
             return getJsonResponse(dataTypeName=dataType, createdData=submodule, created=created)
     return JsonResponse({"ok": False, "error": "Invalid dataType."}, status=400)

@@ -1,15 +1,3 @@
-// --- CSRF helper (required for Django POST requests) ---
-function getCookie(name) {
-  const cookies = document.cookie ? document.cookie.split(";") : [];
-  for (let c of cookies) {
-    c = c.trim();
-    if (c.startsWith(name + "=")) {
-      return decodeURIComponent(c.substring(name.length + 1));
-    }
-  }
-  return null;
-}
-
 const csrftoken = getCookie("csrftoken");
 
 const subjectsList = document.getElementById("subjectsList");
@@ -50,12 +38,12 @@ let AddorRemove = "";
 
 window.$('#chooseCategoryModal').on('show.bs.modal', function (e) {
   console.log("Modal is opening");
-  var chooseCategoryTitle = document.querySelector('#chooseCategoryModal .modal-title');
+  let chooseCategoryTitle = document.querySelector('#chooseCategoryModal .modal-title');
   const trigger = e.relatedTarget;   // the button that opened it
   console.log("Trigger:", trigger);
 
   if (trigger) {
-    action = trigger.dataset.action
+    const action = trigger.dataset.action
     console.log("data-action:", action);
     console.log("Action:", action);
     AddorRemove = action;
@@ -114,7 +102,7 @@ confirmOptionSelection.addEventListener("click", (e) => {
   } else if (selectedType == "module" || selectedType == "submodule") {
     window.$("#chooseCategoryModal").modal("hide");
     if (AddorRemove == "add") {
-      var MSMTitle = document.querySelector('#addModuleSubModuleModal .modal-title');
+      let MSMTitle = document.querySelector('#addModuleSubModuleModal .modal-title');
       MSMTitle.textContent = "".concat("Add a ", selectedType);
       if (selectedType == "module") {
         moduleSelect.style.display = "none";
@@ -125,9 +113,9 @@ confirmOptionSelection.addEventListener("click", (e) => {
       }
       window.$("#addModuleSubModuleModal").modal("show");
     } else if (AddorRemove == "remove") {
-      var MSMTitle = document.querySelector('#removeModuleSubModuleModal .modal-title');
-      remModuleSelect = document.getElementById("remMselect");
-      remSubModuleSelect = document.getElementById("remSMselect");
+      let MSMTitle = document.querySelector('#removeModuleSubModuleModal .modal-title');
+      const remModuleSelect = document.getElementById("remMselect");
+      const remSubModuleSelect = document.getElementById("remSMselect");
       if (selectedType == "module") {
         MSMTitle.textContent = "Select a " + selectedType + " to remove";
         remSubModuleSelect.style.display = "none";
@@ -387,12 +375,12 @@ confirmAddSubject.addEventListener("click", async () => {
       return;
     }
 
-    addSubjectToUI(data.subject);
+    addSubjectToUI(data.item);
     subjectNameInput.value = "";
 
     // Close modal (Bootstrap 4)
     window.$("#addSubjectModal").modal("hide");
-    ensureSubjectNode(data.subject); //update sidebar w/o reload
+    ensureSubjectNode(data.item); //update sidebar w/o reload
   } catch (err) {
     addSubjectError.textContent = "Network error. Check your server is running.";
   }
@@ -407,7 +395,7 @@ confirmAddMSM.addEventListener("click", async () => {
     msmError.textContent = "Please enter a " + selectedType + " name.";
     return;
   }
-  selectedParentId = null;
+  let selectedParentId = null;
   console.log("Type: " + selectedType)
   if (selectedType == "module") {
     selectedParentId = subjectSelect.value
@@ -506,7 +494,7 @@ confirmRemoveMSM.addEventListener("click", async () => {
   const typeToRemove = selectedType;
   console.log("Attempting to remove type:", selectedType);
   removeMSMError.textContent = "";
-  var optionID = null;
+  let optionID = null;
   if (selectedType == "module") {
     console.log("Selected module ID to remove:", selectedModuleRemove.value);
     optionID = selectedModuleRemove.value;
