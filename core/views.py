@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Subject, Module, SubModule, StudySession
 from django.db.models import Sum, Count
-from datetime import timedelta
+from datetime import timedelta, date
 
 
 @login_required
@@ -29,6 +29,9 @@ def register_view(request):
         form = RegisterForm()
     return render(request, "register.html", {"form": form})
 
+
+
+
 @login_required
 @ensure_csrf_cookie
 def focus_view(request):
@@ -38,18 +41,23 @@ def focus_view(request):
 @login_required
 def insights_view(request):
     subjects = Subject.objects.filter(user=request.user).order_by("name")
-    # Insight 1: Total Time
+
     qs = StudySession.objects.filter(user=request.user)
+
+    # Insight 1: Total Time
     total_seconds = qs.aggregate(total=Sum("duration_seconds"))["total"] or 0
     total_hours = round(total_seconds / 3600.0, 2)
+
     # Insight 2: Last 7 days time
     week_ago = timezone.now() - timedelta(days=7)
     week_seconds = (
-            qs
-            .filter(created_at__gte=week_ago)
-            .aggregate(total=Sum("duration_seconds"))["total"] or 0
+        qs
+        .filter(created_at__gte=week_ago)
+        .aggregate(total=Sum("duration_seconds"))["total"] or 0
     )
     week_hours = round(week_seconds / 3600.0, 2)
+
+    # Insight 3: By subject breakdown
     by_subject = (
         qs
         .filter(subject__isnull=False)
@@ -63,11 +71,36 @@ def insights_view(request):
     by_subject = list(by_subject)
     for row in by_subject:
         row["total_hours"] = round((row["total_seconds"] or 0) / 3600.0, 2)
+
+    # Insight 4: Current streak
+    session_dates = sorted(set(
+        session.started_at.date() for session in qs
+    ))
+
+    if not session_dates:
+        session_streak = 0
+    else:
+        session_streak = 1
+        previous = session_dates[0]
+
+        for session_date in session_dates[1:]:
+            gap = session_date - previous
+            if gap.days == 1:
+                session_streak += 1
+            else:
+                session_streak = 1
+            previous = session_date
+
+        today = date.today()
+        if (today - session_dates[-1]).days > 1:
+            session_streak = 0
+
     context = {
         "subjects": subjects,
         "all_time_hours": total_hours,
         "week_hours": week_hours,
         "by_subject": by_subject,
+        "session_streak": session_streak,
     }
     return render(request, "insights.html", context)
 
