@@ -6,7 +6,9 @@
   <h2>Past 7 days: {{ week_hours }} hours</h2>
   <h3>Current streak: {{ session_streak }} day(s)</h3>
   <h4>All time: {{ all_time_hours }} hours</h4>
-  
+  <h4>Best day of the week: {{ best_day }}</h4>
+  <p>Total sessions: {{ total_sessions }}</p>
+  <p>Average session: {{ avg_session_minutes }} mins</p>
 </div>
 <table class="table table-striped mt-4">
   <thead>
@@ -18,15 +20,15 @@
   </thead>
   <tbody>
     {% for row in by_subject %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ row.subject__name }}</td>
-        <td>{{ row.total_hours }}</td>
-      </tr>
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ row.subject__name }}</td>
+      <td>{{ row.total_hours }}</td>
+    </tr>
     {% empty %}
-      <tr>
-        <td colspan="3">No sessions yet.</td>
-      </tr>
+    <tr>
+      <td colspan="3">No sessions yet.</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>

@@ -11,6 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Subject, Module, SubModule, StudySession
 from django.db.models import Sum, Count
 from datetime import timedelta, date
+from collections import defaultdict
 
 
 @login_required
@@ -94,13 +95,26 @@ def insights_view(request):
         today = date.today()
         if (today - session_dates[-1]).days > 1:
             session_streak = 0
-
+    # Insight 5: Best day of the week (0=Monday, 6=Sunday)
+    day_names = ["Monday", "Tuesday", "Wednesday","Thursday", "Friday", "Saturday", "Sunday"]
+    day_seconds = defaultdict(int)  # any missing key defaults to 0
+    for session in qs:
+        day = session.started_at.weekday()  # 0-6
+        day_seconds[day] += session.duration_seconds
+    best_day = max(day_seconds, key=day_seconds.get) if day_seconds else None
+    best_day_name = day_names[best_day] if best_day is not None else "N/A"
+    # Insight 6: Total sessions + average length
+    total_sessions = qs.count()
+    avg_session_minutes = round((total_seconds / total_sessions) / 60, 1) if total_sessions > 0 else 0
     context = {
         "subjects": subjects,
         "all_time_hours": total_hours,
         "week_hours": week_hours,
         "by_subject": by_subject,
         "session_streak": session_streak,
+        "best_day": best_day_name,
+        "total_sessions": total_sessions,
+        "avg_session_minutes": avg_session_minutes,
     }
     return render(request, "insights.html", context)
 
