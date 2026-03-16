@@ -106,6 +106,18 @@ def insights_view(request):
     # Insight 6: Total sessions + average length
     total_sessions = qs.count()
     avg_session_minutes = round((total_seconds / total_sessions) / 60, 1) if total_sessions > 0 else 0
+    # Insight 7: 24 hour clock
+    today = timezone.now().date()
+    today_sessions = qs.filter(started_at__date=today).select_related("subject")
+
+    clock_data = []
+    for session in today_sessions:
+        clock_data.append({
+            "subject": session.subject.name if session.subject else "General",
+            "start_minutes": session.started_at.hour * 60 + session.started_at.minute,
+            "end_minutes": session.ended_at.hour * 60 + session.ended_at.minute,
+        })
+    
     context = {
         "subjects": subjects,
         "all_time_hours": total_hours,
@@ -115,6 +127,7 @@ def insights_view(request):
         "best_day": best_day_name,
         "total_sessions": total_sessions,
         "avg_session_minutes": avg_session_minutes,
+        "clock_data": json.dumps(clock_data),
     }
     return render(request, "insights.html", context)
 

@@ -10,6 +10,16 @@
   <p>Total sessions: {{ total_sessions }}</p>
   <p>Average session: {{ avg_session_minutes }} mins</p>
 </div>
+<div id="clock-container">
+  <svg id="study-clock" viewBox="-10 -10 220 220" width="300" height="300">
+    <!-- Clock face -->
+    <circle cx="100" cy="100" r="90" fill="white" stroke="#ddd" stroke-width="2" />
+    <!-- Sessions drawn here by JS -->
+    <g id="session-arcs"></g>
+    <!-- Centre dot -->
+    <circle cx="100" cy="100" r="3" fill="#333" />
+  </svg>
+</div>
 <table class="table table-striped mt-4">
   <thead>
     <tr>
@@ -33,4 +43,59 @@
   </tbody>
 </table>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const clockData = {{ clock_data| safe }};
+</script>
+<script>
+  function minutesToAngle(minutes) {
+    return (minutes / 1440) * 360;
+  }
+
+  function angleToCoords(degrees, cx, cy, r) {
+    const radians = degrees * (Math.PI / 180);
+    return {
+      x: cx + r * Math.sin(radians),
+      y: cy - r * Math.cos(radians)
+    };
+  }
+
+  function drawClock() {
+    const colours = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f"];
+    const arcsGroup = document.getElementById("session-arcs");
+
+    clockData.forEach((session, i) => {
+      const startAngle = minutesToAngle(session.start_minutes);
+      const endAngle = minutesToAngle(session.end_minutes);
+      const start = angleToCoords(startAngle, 100, 100, 90);
+      const end = angleToCoords(endAngle, 100, 100, 90);
+      const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+      const colour = colours[i % colours.length];
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d",
+        `M 100 100 L ${start.x} ${start.y} A 90 90 0 ${largeArc} 1 ${end.x} ${end.y} Z`
+      );
+      path.setAttribute("fill", colour);
+      path.setAttribute("opacity", "0.7");
+      arcsGroup.appendChild(path);
+      });
+      for (let i = 0; i < 24; i++) {
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        const hourAngle = minutesToAngle(i * 60);
+        const coords = angleToCoords(hourAngle, 100, 100, 98);
+        text.setAttribute("x", coords.x);
+        text.setAttribute("y", coords.y);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.setAttribute("font-size", "6");
+        text.textContent = i.toString().padStart(2, "0");
+        arcsGroup.appendChild(text);
+      }
+  }
+
+  drawClock();
+</script>
 {% endblock %}
