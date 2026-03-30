@@ -137,7 +137,6 @@ def isDataValid(request):
         data = json.loads(request.body.decode("utf-8") or "{}")
         return True, data
     except json.JSONDecodeError:
-        print("isDataValid - module creation not allowed, invalid JSON")
         return False, JsonResponse({"ok": False, "error": "Invalid JSON."}, status=400)
 def isNameandDatatypeValid(data):
     """
@@ -172,8 +171,6 @@ def getJsonResponse(dataTypeName, createdData, created, parent_id=None):
 @require_POST
 def api_add_subject(request):
     DataValid, data = isDataValid(request)
-    print(request.body)
-    print(json.dumps(data, indent = 4))
     if not DataValid:
         return data
 
@@ -205,12 +202,10 @@ def api_add_subject(request):
 @login_required
 @require_POST
 def api_delete_subject(request):
-    print("Delete API called")
     try:
         data = json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
         return JsonResponse({"ok": False, "error": "Invalid JSON."}, status=400)
-    print(data)
     option_id = data.get("id")
     option_type = data.get("type") # subject, module, or submodule
     if option_type not in ["subject", "module", "submodule"]:
@@ -242,8 +237,6 @@ def api_create_session(request):
     except json.JSONDecodeError:
         return JsonResponse({"ok": False, "error": "Invalid JSON."}, status=400)
     session_type = data.get("session_type")
-    print(json.dumps(data, indent = 4))
-    print(f"Session Type: {session_type}")
     duration_seconds = data.get("duration_seconds")
 
     # Validate duration

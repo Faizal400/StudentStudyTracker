@@ -104,5 +104,3 @@ class StudyTrackerTests(TestCase):
         userSubjects = res.context["subjects"]
         self.assertIn(self.other_subject, userSubjects)
         self.assertNotIn(self.subject, userSubjects)
-
-

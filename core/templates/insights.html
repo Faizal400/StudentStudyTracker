@@ -19,6 +19,7 @@
     <!-- Centre dot -->
     <circle cx="100" cy="100" r="3" fill="#333" />
   </svg>
+  <div id="clock-legend"></div>
 </div>
 <table class="table table-striped mt-4">
   <thead>
@@ -61,18 +62,22 @@
       y: cy - r * Math.cos(radians)
     };
   }
-
+    const subjectColours = {};
+    let colourIndex = 0;
   function drawClock() {
-    const colours = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f"];
     const arcsGroup = document.getElementById("session-arcs");
-
     clockData.forEach((session, i) => {
       const startAngle = minutesToAngle(session.start_minutes);
       const endAngle = minutesToAngle(session.end_minutes);
       const start = angleToCoords(startAngle, 100, 100, 90);
       const end = angleToCoords(endAngle, 100, 100, 90);
       const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
-      const colour = colours[i % colours.length];
+      if (!subjectColours[session.subject]) {
+        const hue = (colourIndex * 137.5) % 360;
+        subjectColours[session.subject] = `hsl(${hue}, 70%, 55%)`;
+        colourIndex++;
+      }
+      const colour = subjectColours[session.subject];
 
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d",
@@ -81,21 +86,45 @@
       path.setAttribute("fill", colour);
       path.setAttribute("opacity", "0.7");
       arcsGroup.appendChild(path);
-      });
-      for (let i = 0; i < 24; i++) {
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        const hourAngle = minutesToAngle(i * 60);
-        const coords = angleToCoords(hourAngle, 100, 100, 98);
-        text.setAttribute("x", coords.x);
-        text.setAttribute("y", coords.y);
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("dominant-baseline", "middle");
-        text.setAttribute("font-size", "6");
-        text.textContent = i.toString().padStart(2, "0");
-        arcsGroup.appendChild(text);
-      }
+    });
+    for (let i = 0; i < 24; i++) {
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      const hourAngle = minutesToAngle(i * 60);
+      const coords = angleToCoords(hourAngle, 100, 100, 98);
+      text.setAttribute("x", coords.x);
+      text.setAttribute("y", coords.y);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("font-size", "6");
+      text.textContent = i.toString().padStart(2, "0");
+      arcsGroup.appendChild(text);
+    }
   }
+  function drawLegend() {
+    const legend = document.getElementById("clock-legend");
+    Object.entries(subjectColours).forEach(([subject, colour]) => {
+      const item = document.createElement("div");
+      item.style.display = "flex";
+      item.style.alignItems = "center";
+      item.style.marginBottom = "4px";
 
+      const square = document.createElement("span");
+      square.style.width = "12px";
+      square.style.height = "12px";
+      square.style.backgroundColor = colour;
+      square.style.marginRight = "6px";
+      square.style.display = "inline-block";
+
+      const label = document.createElement("span");
+      label.textContent = subject;
+
+      item.appendChild(square);
+      item.appendChild(label);
+      legend.appendChild(item);
+    });
+  }
   drawClock();
+  drawLegend();
 </script>
+
 {% endblock %}

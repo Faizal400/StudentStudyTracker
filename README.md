@@ -2,8 +2,6 @@
 > A Django web application that helps students track study time by subject/module/submodule, run a focus timer and view time-based categorised insights - allowing a simple way to log time and build consistency.
 *Instead of just “a timer”, it links sessions to a hierarchical study tree and surfaces time-based insights (starter phase).*
 
-#### **Note**: This project is FAR from completion.
-
 ---
 ## The original (small) plan outline for this project.
 Visit:
@@ -36,10 +34,17 @@ Visit:
 - On stop or completion, the session is saved via POST request (AJAX/fetch)
 - Sessions can be linked to:
     - Subject OR Module OR SubModule (starter implementation)
-**__Insights (starter analytics)__**
-- All-time study hours
-- Last 7 days study hours
-- Top subjects ranked by time
+**__Insights (upgraded analytics)__**
+- Current study streak (consecutive days)
+- Best day of the week by total hours
+- All-time and 7-day study hours
+- Total sessions count and average session duration
+- 24-hour study clock: today's sessions visualised as 
+  colour-coded arcs on an SVG clock face, one colour per subject (only shows what you've done "today", not on previous days)
+
+**__Automated Tests__**
+- 8 tests covering authentication, data isolation between 
+  users, input validation, and session data integrity
 
 ---
 ## Technologies used
@@ -129,11 +134,10 @@ Visit:
     - User action → JS fetch POST → Django view validates ownership → ORM write → JSON response → UI updates
 ---
 ## Roadmap
-- Replace “page reload after CRUD” with true dynamic DOM updates
-- Improve insight granularity (modules/submodules + drill-down)
-- Add charts (weekly trend graph + category breakdown)
-- Add session history page (recent sessions table + filters)
-- Add basic settings (default timer duration, goal hours/week)
+- Day navigation on 24-hour clock (← →)
+- Manual time blocks (sleep, commute etc.)
+- Module/submodule drill-down in insights
+- CSV export of session history
 ---
 ## Known & current limitations
 - CRUD actions currently reload the page to reflect sidebar changes (simple starter approach)
