@@ -150,3 +150,35 @@ __TEST 1T: Register__
 
 Whitespace (small visual error):
     - ![whitespace](test_screenshots/test1_a/dropdown_settings_whitespace.png)
+
+
+---
+---
+---
+
+# 1st April 2025 - 13:00PM
+
+Tried using my own SST app today.
+
+My intention was: Create a subject "university", with modules being my actual current modules I was working on today.
+
+I made two, one in which was called EXTOOP. I set the duration for 56minutes (12:34PM - > 1:30PM). I pressed start on the focus clock & the time was going down when I pressed start & was on the page. I also tested it where I went on a different tab and the time was still going down. So it should be okay, right?
+
+I tabbed out and began working for about 25 minutes. I expected the focus timer to be somewhere around in the 30s (30-35 minutes). But to my surprise, it was near to where I left it - 55 minutes. I didn't press pause, because when I went back on the tab the timer was going down (again - but not behind the scenes).
+
+So there is a clear issue.
+
+Also, some user usability things that could be improved:
+- When adding a subject / module / sub module, all the functionalities don't get updated. It is updated when you reload. What I mean by this is, in today's example I added subject "University". The side bar was updated without having to reload the page. However, the button (addCategoryModal) doesn't show the added subject (University) when I created it. As a developer, I knew you had to reload the page. But this could lead to issues where users may not know to reload, and they would instead create multiple entries of the same subject. So I will have to re-introduce page reloads until I've found a solution that can update the added entries globally. Also, when I did EXTOOP & hit stop on the focus it doesn't show on the clock either - even after multiple ctrl + shift + r page reloads.
+Some other things:
+
+- The "insights" page has it's priorities wrong. After using my own product, I want to mainly see what I've recently done (today). The other insights are nice to have, but they should be further down.
+    - Insights page should be like this:
+        - [Hours spent working today]
+        - [ Streak ]
+        - [ 24 hour clock]
+        - [ Breakdown on today's hours (the table, ranked)]
+        - [ Other insights, past 7 days etc & top subjects ranked ] 
+- Another thing that could be added is the combination of hours. For example, on the 24 hour clock there could be check boxes for "Group by subjects" "Group by modules" for example. Like right now, the clock doesn't show any module/sub module data which explains why I don't see EXTOOP on the clock.
+
+- The insights page in general is incomplete. I need to add module / sub module data to it. Currently there's a table that displays the total number of hours per subject. But this doesn't account for module data. So I think this table, which should be towards the bottom of the page should sum up the module and sub module hours and aggregate it to subject hours. And then, for each table entry (subject) the user can click on a clear visible checkbox which breaks down the subject row into modules, submodules etc which are ranked. 
