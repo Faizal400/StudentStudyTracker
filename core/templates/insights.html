@@ -3,14 +3,10 @@
 {% block content %}
 
 <div class="text-center">
-  <h2>Past 7 days: {{ week_hours }} hours</h2>
-  <h3>Current streak: {{ session_streak }} day(s)</h3>
-  <h4>All time: {{ all_time_hours }} hours</h4>
-  <h4>Best day of the week: {{ best_day }}</h4>
-  <p>Total sessions: {{ total_sessions }}</p>
-  <p>Average session: {{ avg_session_minutes }} mins</p>
+  <h2>Today's study time: {{ today_hours }} hours</h2>
+  <h3>Current study streak: {{ session_streak }} day(s)</h3>
 </div>
-<div id="clock-container">
+<div id="clock-container" class="d-flex flex-column align-items-center">
   <svg id="study-clock" viewBox="-10 -10 220 220" width="300" height="300">
     <!-- Clock face -->
     <circle cx="100" cy="100" r="90" fill="white" stroke="#ddd" stroke-width="2" />
@@ -19,7 +15,26 @@
     <!-- Centre dot -->
     <circle cx="100" cy="100" r="3" fill="#333" />
   </svg>
-  <div id="clock-legend"></div>
+  <b></b>
+  <div id="clock-legend" class="nav justify-content-center"></div>
+</div>
+<!--Insert today's study time table breakdown here. Should show a list of subjects, and total hours for each subject. Each subject has a dropdown button, 
+where you can see modules and sub modules which have their own total hours. When the subject breakdown dropdown is closed (default & you can only see subjects), the total hours column
+shows the total (sum) of hours for the subject itself, and it's modules and submoodules. When you click on the dropdown to show the modules and submodules, 
+the total hours column for each subject should only show the hours for that subject itself,  and not include the hours for its modules and submodules.
+We can also add the same dropdown feature for modules, where it then shows the submodules for that module, and the total hours column for the module 
+only shows the hours for that module itself,  and not include the hours for its submodules unless the dropdown is clicked and the user can see the submodules.
+
+ALso, When you click on an item, it shows you the date and time of each session for that item.
+
+The table should look like the below table (starting with the line <table class="table table-striped mt-4">), but with the dropdown feature and session details on click as described above.
+-->
+<div class="text-center">
+  <h4 class="mb-1">Past 7 days: {{ week_hours }} hours</h4>
+  <h5 class="mb-1">Best day of the week: {{ best_day }}</h5>
+  <p class="mb-1">Total sessions: {{ total_sessions }}</p>
+  <p class="mb-1">All time hours: {{ all_time_hours }} hours</p>
+  <p class="mb-1">Average session duration: {{ avg_session_minutes }} mins</p>
 </div>
 <table class="table table-striped mt-4">
   <thead>
@@ -120,6 +135,9 @@
 
       item.appendChild(square);
       item.appendChild(label);
+      legend.style.display = "flex";legend.style.flexWrap = "wrap";
+      legend.style.gap = "12px";
+      legend.style.justifyContent = "center";
       legend.appendChild(item);
     });
   }

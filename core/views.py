@@ -109,6 +109,8 @@ def insights_view(request):
     # Insight 7: 24 hour clock
     today = timezone.now().date()
     today_sessions = qs.filter(started_at__date=today).select_related("subject")
+    today_seconds = today_sessions.aggregate(total=Sum("duration_seconds"))["total"] or 0
+    today_hours = round(today_seconds / 3600.0, 2)
 
     clock_data = []
     for session in today_sessions:
@@ -127,6 +129,7 @@ def insights_view(request):
         "best_day": best_day_name,
         "total_sessions": total_sessions,
         "avg_session_minutes": avg_session_minutes,
+        "today_hours": today_hours,
         "clock_data": json.dumps(clock_data),
     }
     return render(request, "insights.html", context)
