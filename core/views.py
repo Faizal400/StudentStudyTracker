@@ -144,6 +144,8 @@ def isNameandDatatypeValid(data):
     - Subject
     - Module
     - Sub Module
+    Checks if any of the 3 (dataType, name, parentId) are missing or invalid. 
+    ParentId is only needed for module and submodule, but we can ignore it for subject since it won't be used.
     """
     name = (data.get("name") or "").strip()
     dataTypeName = (data.get("dataType") or "").strip()
@@ -189,14 +191,14 @@ def api_add_subject(request):
             except Subject.DoesNotExist:
                 return JsonResponse({"ok": False, "error": "Parent subject not found."}, status=404)
             module, created = Module.objects.get_or_create(subject=parent_subject, name=name)
-            return getJsonResponse(dataTypeName=dataType, createdData= module, created=created)
+            return getJsonResponse(dataTypeName=dataType, createdData= module, created=created, parent_id=ParentId)
         elif dataType == "submodule":
             try:
                 parent_module = Module.objects.get(id=ParentId, subject__user=request.user)
             except Module.DoesNotExist:
                 return JsonResponse({"ok": False, "error": "Parent module not found."}, status=404)
             submodule, created = SubModule.objects.get_or_create(module=parent_module, name=name)
-            return getJsonResponse(dataTypeName=dataType, createdData=submodule, created=created)
+            return getJsonResponse(dataTypeName=dataType, createdData=submodule, created=created, parent_id=ParentId)
     return JsonResponse({"ok": False, "error": "Invalid dataType."}, status=400)
 
 @login_required
@@ -229,6 +231,19 @@ def api_delete_subject(request):
             return JsonResponse({"ok": False, "error": f"{option_type} not found."}, status=404)
     return JsonResponse({"ok": True, "deleted_id": option_id})
 
+def create_session_object(user, session_type, the_object, duration_seconds):
+    ended_at = timezone.now()
+    started_at = ended_at - timedelta(seconds=duration_seconds)
+    kwargs = {
+        "user": user,
+        "duration_seconds": duration_seconds,
+        "started_at": started_at, # simple since it doesn't consider tiny delays such as user clicking start and stop, or network time. We can improve later if needed.
+        "ended_at": ended_at,
+        session_type: the_object
+    }
+    session = StudySession.objects.create(**kwargs)
+    return session
+
 @login_required
 @require_POST
 def api_create_session(request):
@@ -256,38 +271,18 @@ def api_create_session(request):
             subject = Subject.objects.get(id=int(item_id), user=request.user)
         except (TypeError, ValueError, Subject.DoesNotExist):
             return JsonResponse({"ok": False, "error": "Invalid subject."}, status=400)
-        ended_at = timezone.now()
-        started_at = ended_at - timedelta(seconds=duration_seconds)
-        session = StudySession.objects.create(
-            user=request.user,
-            subject=subject,
-            duration_seconds=duration_seconds,
-            started_at=started_at, # simple since it doesn't consider tiny delays such as user clicking start and stop, or network time. We can improve later if needed.
-            ended_at= ended_at,
-            )
+        session = create_session_object(user=request.user, session_type=session_type, the_object=subject, duration_seconds=duration_seconds)
     elif session_type == "module":
         try:
             module = Module.objects.get(id=int(item_id), subject__user=request.user)
         except (TypeError, ValueError, Module.DoesNotExist):
             return JsonResponse({"ok": False, "error": "Invalid module."}, status=400)
-        session = StudySession.objects.create(
-            user=request.user,
-            module=module,
-            duration_seconds=duration_seconds,
-            started_at=timezone.now(),   # simple for now
-            ended_at=timezone.now(),
-            )
+        session = create_session_object(user=request.user, session_type=session_type, the_object=module, duration_seconds=duration_seconds)
     elif session_type == "submodule":
         try:
             submodule = SubModule.objects.get(id=int(item_id), module__subject__user=request.user)
         except (TypeError, ValueError, SubModule.DoesNotExist):
             return JsonResponse({"ok": False, "error": "Invalid submodule."}, status=400)
-        session = StudySession.objects.create(
-            user=request.user,
-            submodule=submodule,
-            duration_seconds=duration_seconds,
-            started_at=timezone.now(),   # simple for now
-            ended_at=timezone.now(),
-            )
+        session = create_session_object(user=request.user, session_type=session_type, the_object=submodule, duration_seconds=duration_seconds)
 
     return JsonResponse({"ok": True, "session_id": session.id})

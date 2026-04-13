@@ -141,7 +141,7 @@ function removeEmptyMsgIfExists() {
   if (msg) msg.remove();
 }
 
-// Add subject to DOM list + remove dropdown
+// Add subject to the homepage subject DOM list (the one at the bottom centre).
 function addSubjectToUI(subject) {
   removeEmptyMsgIfExists();
 
@@ -149,11 +149,6 @@ function addSubjectToUI(subject) {
   li.dataset.subjectId = subject.id;
   li.textContent = subject.name;
   subjectsList.appendChild(li);
-
-  const opt = document.createElement("option");
-  opt.value = subject.id;
-  opt.textContent = subject.name;
-  removeSelect.appendChild(opt);
 }
 
 // Remove subject from DOM list + remove dropdown
@@ -176,6 +171,21 @@ function removeSubjectFromUI(subjectId) {
 // ==============================
 // SIDEBAR DOM HELPERS (DIV layout)
 // ==============================
+
+function addOption(selectEl, id, name) {
+  // Adds <option value=id>name</option> to the select dropdown (selectEl). Intended for modal 
+  // selectedEl is th e select dropdown where we want to add an option (e.g. moduleSelect or selectedModuleRemove)
+  if (!selectEl) return;
+  // avoid duplicates
+  if (selectEl.querySelector(`option[value="${id}"]`)) return;
+  const opt = document.createElement("option");
+  opt.value = id;
+  opt.textContent = name;
+  selectEl.appendChild(opt);
+}
+
+
+
 function getSidebarRoot() {
   return document.getElementById("sidebarTree");
 }
@@ -340,10 +350,34 @@ function removeSubmoduleFromSidebar(submoduleId) {
 }
 
 function removeOptionFromSelect(selectEl, value) {
+  // the opposite of this function is the function addOption(selectEl, id, name) which is defined above
   if (!selectEl) return;
   const opt = selectEl.querySelector(`option[value="${value}"]`);
   if (opt) opt.remove();
 }
+
+// ==============================
+// On added item (subject/module/submodule)
+function onSubjectAdded(subject) {
+    ensureSubjectNode(subject);       // sidebar
+    addSubjectToUI(subject);          // add subject to sidebar w/o reload
+    addOption(removeSelect, subject.id, subject.name);        // remove subject dropdown
+    addOption(subjectSelect, subject.id, subject.name);       // add module dropdown
+}
+
+function onModuleAdded(module, parentSubjectId) {
+    addModuleToSidebar(module, parentSubjectId);  // sidebar w/o reload
+    addOption(moduleSelect, module.id, module.name);             // add submodule dropdown
+    addOption(selectedModuleRemove, module.id, module.name);     // remove module dropdown
+}
+
+function onSubmoduleAdded(submodule, parentModuleId) {
+    addSubmoduleToSidebar(submodule, parentModuleId); // sidebar w/o reload
+    addOption(selectedSubModuleRemove, submodule.id, submodule.name); // remove submodule dropdown
+}
+
+// NOTE: It sounds weird "on[item]Added" functions that there's a line saying "remove [item] dropdown" but it's because when 
+// we add a module, we need to add it to the remove module dropdown (so the user can remove it)
 
 // ==============================
 
@@ -375,12 +409,10 @@ confirmAddSubject.addEventListener("click", async () => {
       return;
     }
 
-    addSubjectToUI(data.item);
+    onSubjectAdded(data.item); // data.item includes the new subject's id (now created - in DB) and name.
     subjectNameInput.value = "";
-
     // Close modal (Bootstrap 4)
     window.$("#addSubjectModal").modal("hide");
-    ensureSubjectNode(data.item); //update sidebar w/o reload
   } catch (err) {
     addSubjectError.textContent = "Network error. Check your server is running.";
   }
@@ -431,19 +463,13 @@ confirmAddMSM.addEventListener("click", async () => {
       if (data.type === "module") {
         // Expect backend to return: data.item or data.module
         const moduleObj = data.item || data.module;
-        const parentSubjectId = selectedParentId;
-        addModuleToSidebar(moduleObj, parentSubjectId);
-
-        // Module dropdowns (for adding/removing)
-        addOption(moduleSelect, moduleObj.id, moduleObj.name);
-        addOption(selectedModuleRemove, moduleObj.id, moduleObj.name);
+        const parentSubjectId = selectedParentId; // we already have this from before the fetch. Alternatively, backend does return it but we don't use it since we have it here.
+        onModuleAdded(moduleObj, parentSubjectId); // updates sidebar + dropdowns
       }
       if (data.type === "submodule") {
         const subObj = data.item || data.submodule;
         const parentModuleId = selectedParentId;
-        addSubmoduleToSidebar(subObj, parentModuleId);
-
-        addOption(selectedSubModuleRemove, subObj.id, subObj.name);
+        onSubmoduleAdded(subObj, parentModuleId); // updates sidebar + dropdown
       }
     }
   } catch (err) {
