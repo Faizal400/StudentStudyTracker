@@ -12,11 +12,11 @@
     <select id="subjectSelect" class="form-control">
       <option value="">-- Choose a subject --</option>
       {% for s in subjects %}
-      <option value="{{ s.id }}" type="subject">{{ s.name }}</option>
+      <option value="{{ s.id }}" type="subject" style="font-weight: bold;">{{ s.name }}</option>
       {% for m in s.modules.all %}
-      <option value="{{ m.id }}" parentId = "{{ s.id }}" type = "module">[Module]: {{ s.name }} → {{ m.name }}</option>
+      <option value="{{ m.id }}" type="module">&nbsp;↳ {{ m.name }}</option>
       {% for sm in m.submodules.all %}
-      <option value="{{ sm.id }}" parentId = "{{ m.id }}" type="submodule">[Sub Module]: {{ s.name }} → {{ m.name }} → {{ sm.name }}</option>
+      <option value="{{ sm.id }}" type="submodule">&nbsp;&nbsp;&nbsp;↳↳ {{ sm.name }}</option>
       {% endfor %}
       {% endfor %}
       {% endfor %}

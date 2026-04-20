@@ -5,39 +5,64 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "studytracker.settings")
 django.setup()
 
 from django.contrib.auth.models import User
-from core.models import Subject, StudySession
+from core.models import Subject, Module, SubModule, StudySession
 from django.utils import timezone
 from datetime import timedelta
-import random
 from dotenv import load_dotenv
+import random
 
 load_dotenv()
 
-# ||| Config  ----------------------------------------------
-OVERRIDE_TODAY    = True    # wipe today's sessions before seeding
-BEGIN_TIME_24H    = 8       # 8am
-END_TIME_24H      = 20      # 8pm
-MAX_SESSION_HOURS = 2.0     # cap per session (handles 1–2 subject edge case)
-VARIATION         = 0.25    # plus or minus 25% variation from avg
-BREAK_RATIO       = 0.30    # 30% of total time reserved for breaks
+# ── Config ──────────────────────────────────────────────
+OVERRIDE_TODAY    = True
+BEGIN_TIME_24H    = 8
+END_TIME_24H      = 20
+MAX_SESSION_HOURS = 2.0
+VARIATION         = 0.25
+BREAK_RATIO       = 0.30
 
-# ||| User ----------------------------------------------
+# ── User ────────────────────────────────────────────────
 username = os.environ.get('SEED_USERNAME')
 user = User.objects.get(username=username)
 print(f"Seeding for: {user.username}")
 
-# ||| Seed subjects if they don't exist ----------------------------------------------
-Subject.objects.get_or_create(user=user, name="Computer Science")
-Subject.objects.get_or_create(user=user, name="Mathematics")
-Subject.objects.get_or_create(user=user, name="Physics")
+# ── Seed helper ─────────────────────────────────────────
+def seed_items(model, names, **parent):
+    """
+    Creates (or gets) a list of named items under a given parent.
+    Returns list of the created/fetched objects.
+    """
+    items = []
+    for name in names:
+        obj, created = model.objects.get_or_create(name=name, **parent)
+        items.append(obj)
+        status = "created" if created else "exists"
+        print(f"  [{status}] {model.__name__}: {name}")
+    return items
 
-# ||| Override today's data ----------------------------------------------
+# ── Seed structure ───────────────────────────────────────
+print("\nSeeding subjects...")
+subjects = seed_items(Subject, ["Computer Science", "Mathematics", "Physics"], user=user)
+
+cs, maths, physics = subjects[0], subjects[1], subjects[2]
+
+print("\nSeeding modules...")
+cs_modules     = seed_items(Module, ["Algorithms", "Databases", "Networks"], subject=cs)
+maths_modules  = seed_items(Module, ["Calculus", "Statistics"],              subject=maths)
+physics_modules= seed_items(Module, ["Mechanics", "Thermodynamics"],         subject=physics)
+
+print("\nSeeding submodules...")
+seed_items(SubModule, ["Sorting", "Searching", "Graph Theory"], module=cs_modules[0])
+seed_items(SubModule, ["SQL", "ORM", "Indexing"],               module=cs_modules[1])
+seed_items(SubModule, ["TCP/IP", "DNS"],                        module=cs_modules[2])
+
+# ── Override today's data ────────────────────────────────
 today = timezone.now().date()
 if OVERRIDE_TODAY:
     deleted, _ = StudySession.objects.filter(user=user, started_at__date=today).delete()
-    print(f"Deleted {deleted} session(s) for today.")
+    print(f"\nDeleted {deleted} session(s) for today.")
 
-# ||| Setup ----------------------------------------------
+# ── Setup ────────────────────────────────────────────────
 user_subjects = list(Subject.objects.filter(user=user))
 random.shuffle(user_subjects)
 TOTAL_SUBJECTS = len(user_subjects)
@@ -46,68 +71,44 @@ if TOTAL_SUBJECTS == 0:
     print("No subjects found. Exiting.")
     exit()
 
-total_time  = END_TIME_24H - BEGIN_TIME_24H             # hours
-break_pool  = total_time * BREAK_RATIO                  # hours for breaks
-study_pool  = total_time - break_pool                   # hours for study
-
-# Cap avg to avoid unrealistic sessions with very few subjects
+total_time  = END_TIME_24H - BEGIN_TIME_24H
+break_pool  = total_time * BREAK_RATIO
+study_pool  = total_time - break_pool
 avg_study   = min(study_pool / TOTAL_SUBJECTS, MAX_SESSION_HOURS)
 num_breaks  = TOTAL_SUBJECTS - 1
 avg_break   = (break_pool / num_breaks) if num_breaks > 0 else 0
 
-# ||| Section subjects: above / below / avg ----------------------------------------------
+# ── Section subjects ─────────────────────────────────────
 above_s = TOTAL_SUBJECTS // 2
 below_s = TOTAL_SUBJECTS // 2
-avg_s   = TOTAL_SUBJECTS % 2       # 1 if odd, 0 if even
-
+avg_s   = TOTAL_SUBJECTS % 2
 subject_types = ["above"] * above_s + ["below"] * below_s + ["avg"] * avg_s
 random.shuffle(subject_types)
 
-# ||| Section breaks: above / below / avg ----------------------------------------------
+# ── Section breaks ───────────────────────────────────────
 if num_breaks > 0:
-    above_b = num_breaks // 2
-    below_b = num_breaks // 2
-    avg_b   = num_breaks % 2
-    break_types = ["above"] * above_b + ["below"] * below_b + ["avg"] * avg_b
+    break_types = ["above"] * (num_breaks // 2) + ["below"] * (num_breaks // 2) + ["avg"] * (num_breaks % 2)
     random.shuffle(break_types)
 else:
     break_types = []
 
-# ||| Build interleaved schedule ----------------------------------------------
-# [subject, break, subject, break, ..., subject]
-"""
-Example:
-[
-    ("subject", "above"),
-    ("break", "below"),
-    ("subject", "below"),
-    ("break", "avg"),
-    ("subject", "avg"),
-]
-"""
+# ── Build schedule ───────────────────────────────────────
 schedule = []
 for i in range(TOTAL_SUBJECTS):
     schedule.append(("subject", subject_types[i]))
     if i < num_breaks:
         schedule.append(("break", break_types[i]))
 
-# ||| Duration calculator with surplus nudging ----------------------------------------------
+# ── Duration calculator ──────────────────────────────────
 def get_duration(avg, slot_type, surplus):
-    if slot_type == "avg":
-        base = avg
-    elif slot_type == "above":
-        base = avg * (1 + VARIATION)
-    else:
-        base = avg * (1 - VARIATION)
-    # nudge back toward avg if surplus drifts too far
-    nudge = -surplus * 0.1
-    return max(0.1, base + nudge)
+    base = avg * (1 + VARIATION if slot_type == "above" else (1 - VARIATION if slot_type == "below" else 1))
+    return max(0.1, base + (-surplus * 0.1))
 
-# ||| Loop & create sessions ----------------------------------------------
-current_time   = float(BEGIN_TIME_24H)
-surplus_study  = 0.0
-surplus_break  = 0.0
-subject_index  = 0
+# ── Create sessions ──────────────────────────────────────
+current_time  = float(BEGIN_TIME_24H)
+surplus_study = 0.0
+surplus_break = 0.0
+subject_index = 0
 
 print("\nSchedule:")
 for slot_kind, slot_type in schedule:
@@ -135,8 +136,7 @@ for slot_kind, slot_type in schedule:
         print(f"  {subject.name}: {start_h:02d}:{start_m:02d} → {end_h:02d}:{end_m:02d} ({slot_type})")
         current_time = end_t
         subject_index += 1
-
-    else:  # break
+    else:
         break_h = get_duration(avg_break, slot_type, surplus_break)
         surplus_break += (break_h - avg_break)
         print(f"  [break {slot_type}: {break_h * 60:.0f} mins]")

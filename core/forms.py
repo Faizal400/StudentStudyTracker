@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 class RegisterForm(UserCreationForm):
+    username = forms.CharField(max_length=20)
     email = forms.EmailField(required=True)
     def clean_username(self):
         username = self.cleaned_data["username"].strip().lower()
